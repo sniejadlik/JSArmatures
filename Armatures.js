@@ -48,8 +48,11 @@ function init()
 	for (i=0;i<limit;++i)
 	{
 		//createZebra();
-		createZebydracorn();
+		//createZebydracorn();
 		//createStrongman();
+		var zebraID = "zebraSprite--"+i;
+		var zebra = new Zebra(zebraID)
+		zebra.createZebra(i,image);
 	}
 
 	
@@ -98,53 +101,6 @@ function createStrongman()
 	
 
 	strongmen++;
-}
-
-
-
-function createZebra()
-{
-	$(".zebra").append('<div id="zebraSprite--'+zebras+'" class="armatureSprite Sprite" ></div>');
-	
-	var zebraID = "zebraSprite--"+zebras;
-	var zebra = new Armature(zebraID,image);
-	var rot = Math.random()*30;
-
-	zebra.createArmature(zebras, image);
-	zebra.createPiece('zebraSprite','zebraBody',85,98,72,107,34,85,0,0,1000,1, Math.random()*10-5);
-
-	// create right front leg
-	zebra.createPiece('zebraBody','zebraBackForeLeg',26,0,60,38, 47, 29,-35,10,-10);
-	zebra.createPiece('zebraBackForeLeg','zebraBackForeHoof',35,38,51,40, 40, 9,-35,5,-10);
-
-	//create right back leg
-	zebra.createPiece('zebraBody','zebraBackHindLeg',35,108,42,53, 28,14,5,70,-10);
-	zebra.createPiece('zebraBackHindLeg','zebraBackHindHoof',35,165,42,40, 38,9,-27,38,-10);
-
-	//create neck
-	zebra.createPiece('zebraBody','zebraNeck',95,60,63,30, 30,24,15,-5,10);
-		
-	//create head
-	zebra.createPiece('zebraNeck','zebraHead',95,0,63,61, 42, 43,0,-50,10);
-
-	// create left front leg
-	zebra.createPiece('zebraBody','zebraFrontForeLeg',0,77,77,32,60,15,-45,20,10);
-	zebra.createPiece('zebraFrontForeLeg','zebraFrontForeHoof',9,108,20,58,10,14,5,11,10);
-
-	// create left back leg
-	zebra.createPiece('zebraBody','zebraFrontHindLeg',164,9,36,54,21,17,33,85,10);
-	zebra.createPiece('zebraFrontHindLeg','zebraFrontHindHoof',174,66,26,59,18,9,10,40,10);
-
-	//create tail
-	zebra.createPiece('zebraBody','zebraTail',167,144,32,62,5,13,58,77,10);
-	var sprite = $('#'+zebraID);
-
-	zebra.animatePieces();
-	
-	TweenMax.to(sprite,2,{css:{transform:"translateX("+((Math.random()*100)+200)*zebras+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
-	//TweenMax.to(sprite,2,{opacity:1});
-	zebras++;
-
 }
 
 
@@ -271,9 +227,49 @@ function Zebra(id) {
 }
 
 Zebra.inheritsFrom(Armature);
-Zebra.prototype.kickLegs = function()
+
+
+Zebra.prototype.createZebra = function(num,imageAsset)
 {
+
+	var zebraID = this._id;
+	$(".zebra").append('<div id="'+zebraID+'" class="armatureSprite Sprite" ></div>');
 	
+	var rot = Math.random()*30;
+
+	this.createArmature(num, imageAsset);
+	this.createPiece('zebraSprite','zebraBody',85,98,72,107,34,85,0,0,1000,1, Math.random()*10-5);
+
+	// create right front leg
+	this.createPiece('zebraBody','zebraBackForeLeg',26,0,60,38, 47, 29,-35,10,-10);
+	this.createPiece('zebraBackForeLeg','zebraBackForeHoof',35,38,51,40, 40, 9,-35,5,-10);
+
+	//create right back leg
+	this.createPiece('zebraBody','zebraBackHindLeg',35,108,42,53, 28,14,5,70,-10);
+	this.createPiece('zebraBackHindLeg','zebraBackHindHoof',35,165,42,40, 38,9,-27,38,-10);
+
+	//create neck
+	this.createPiece('zebraBody','zebraNeck',95,60,63,30, 30,24,15,-5,10);
+		
+	//create head
+	this.createPiece('zebraNeck','zebraHead',95,0,63,61, 42, 43,-5,-50,10);
+
+	// create left front leg
+	this.createPiece('zebraBody','zebraFrontForeLeg',0,77,77,32,60,15,-45,20,10);
+	this.createPiece('zebraFrontForeLeg','zebraFrontForeHoof',9,108,20,58,10,14,5,11,10);
+
+	// create left back leg
+	this.createPiece('zebraBody','zebraFrontHindLeg',164,9,36,54,21,17,33,85,10);
+	this.createPiece('zebraFrontHindLeg','zebraFrontHindHoof',174,66,26,59,18,9,10,40,10);
+
+	//create tail
+	this.createPiece('zebraBody','zebraTail',167,144,32,62,5,13,58,77,10);
+	
+
+	this.animatePieces();
+	var sprite = $('#'+zebraID);
+	TweenMax.to(sprite,2,{css:{transform:"translateX("+((Math.random()*100)+200)*this._num+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
+	//TweenMax.to(sprite,2,{opacity:1});
 }
 
 
@@ -307,7 +303,7 @@ function Armature(id) {
 
 Armature.prototype.createArmature = function(num,imageAsset) 
 {
-    
+    console.log('creating armature'+num)
 	this._num = num;
 	this._asset = imageAsset;
 	
