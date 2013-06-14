@@ -6,6 +6,8 @@
 			  /*src: local('Geo'), local('Geo-Regular'), url('http://themes.googleusercontent.com/font?kit=PZuLMEHg-ApVzHRFEvyOKg') format('truetype');*/
 			}
 
+			
+
 			body {
 				background-color: #000000;
 				margin: 0px;
@@ -68,8 +70,15 @@
 
 			/* Smoke  */
 
-
 			.zebra {
+				position:relative;
+			}
+
+			.strongman {
+				position:relative;
+			}
+
+			.armature {
 				position:relative;
 				top:100px;
 				left:100px;

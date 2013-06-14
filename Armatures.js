@@ -1,6 +1,6 @@
-var zebras = 0, zebydracorns = 0, spriteW=100, spriteH=100 
+var zebras = 0, zebydracorns = 0, strongmen = 0, spriteW=100, spriteH=100 
 
-var image;
+var image, image2;
 
 
 $( document ).ready(function() {
@@ -9,8 +9,13 @@ $( document ).ready(function() {
 
 
 
-function onLoaded() {
+function onFirstLoaded() {
 
+	loadSecondImage();
+}
+
+function onSecondLoaded()
+{
 	init();
 	animate();
 }
@@ -18,7 +23,14 @@ function onLoaded() {
 function loadSpriteSheet() {
 	image = new Image();
     image.src = "ZebraCorn2.png";
-    image.onload = onLoaded;
+    image.onload = onFirstLoaded;
+
+}
+
+function loadSecondImage() {
+	image2 = new Image();
+    image2.src = "NN_Characters.png";
+    image2.onload = onSecondLoaded;
 
 }
 
@@ -35,8 +47,9 @@ function init()
 	var limit = 3;
 	for (i=0;i<limit;++i)
 	{
-		createZebra();
+		//createZebra();
 		createZebydracorn();
+		//createStrongman();
 	}
 
 	
@@ -52,15 +65,52 @@ function init()
 }
 
 
-function createZebra()
+
+function createStrongman()
 {
-	$(".zebra").append('<div id="zebraSprite'+zebras+'" class="armatureSprite Sprite" ></div>');
-	
-	var zebraID = "zebraSprite"+zebras;
-	var zebra = $("#"+zebraID).Armature(zebraID);
+	$(".strongman").append('<div id="strongmanSprite--'+strongmen+'" class="armatureSprite Sprite" ></div>');
+
+	var strongmanID = "strongmanSprite--"+strongmen;
+	var strongman = new Armature(strongmanID);
 	var rot = Math.random()*30;
 
-	zebra.createArmature(zebras);
+	strongman.createArmature(strongmen, image2);
+
+	//309, 717, 414, 516
+	strongman.createPiece('strongmanSprite','strongmanBody',170, 388, 214, 286,111,176,0,0,1000,1, Math.random()*10-5);
+	strongman.createPiece('strongmanBody','strongmanRightShoulder', 303, 710, 107, 112, 43, 148, 178, 20, 10, 1, Math.random()*10-5);
+	strongman.createPiece('strongmanRightShoulder','strongmanRightArm', 13, 107, 122, 179, 43, 148, 20, -120, 10, 1, Math.random()*10-5);
+	
+	strongman.createPiece('strongmanBody','strongmanRightThigh', 274, 854, 124, 150, 43, 148, 110, 205, 10, 1, Math.random()*10-5);
+	strongman.createPiece('strongmanRightThigh','strongmanRightLeg', 1, 536, 122, 200, 43, 148, 70, 90, 10, 1, Math.random()*10-5);
+
+	strongman.createPiece('strongmanBody','strongmanLeftShoulder', 153, 710, 107, 112, 43, 148, -38, 20, 10, 1, Math.random()*10-5);
+	strongman.createPiece('strongmanLeftShoulder','strongmanLeftArm', 13, 301, 122, 179, 43, 148, -30, -120, 10, 1, Math.random()*10-5);
+
+	strongman.createPiece('strongmanBody','strongmanLeftThigh', 144, 854, 124, 150, 43, 148, -18, 205, 10, 1, Math.random()*10-5);
+	strongman.createPiece('strongmanLeftThigh','strongmanLeftLeg', 1, 779, 122, 200, 43, 148, -70, 90, 10, 1, Math.random()*10-5);
+
+	var sprite = $('#'+strongmanID);
+
+	strongman.animatePieces();
+	
+	TweenMax.to(sprite,2,{css:{transform:"translateX("+((Math.random()*100)+200)*strongmen+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
+	
+
+	strongmen++;
+}
+
+
+
+function createZebra()
+{
+	$(".zebra").append('<div id="zebraSprite--'+zebras+'" class="armatureSprite Sprite" ></div>');
+	
+	var zebraID = "zebraSprite--"+zebras;
+	var zebra = new Armature(zebraID,image);
+	var rot = Math.random()*30;
+
+	zebra.createArmature(zebras, image);
 	zebra.createPiece('zebraSprite','zebraBody',85,98,72,107,34,85,0,0,1000,1, Math.random()*10-5);
 
 	// create right front leg
@@ -100,13 +150,13 @@ function createZebra()
 
 function createZebydracorn() 
 {
-	$(".zebra").append('<div id="zebydracornSprite'+zebydracorns+'" class="armatureSprite Sprite" ></div>');
+	$(".zebra").append('<div id="zebydracornSprite--'+zebydracorns+'" class="armatureSprite Sprite" ></div>');
 	
-	var zebydracornID = "zebydracornSprite"+zebydracorns;
-	var zebydracorn = $("#"+zebydracornID).Armature(zebydracornID);
+	var zebydracornID = "zebydracornSprite--"+zebydracorns;
+	var zebydracorn = new Armature(zebydracornID);
 	var rot = Math.random()*30;
 
-	zebydracorn.createArmature(zebydracorns);
+	zebydracorn.createArmature(zebydracorns, image);
 	zebydracorn.createPiece('zebydracornSprite','zebydracornBody',85,98,72,107,34,85,0,0,1000,1, Math.random()*10-5);
 
 	// create right front leg
@@ -121,10 +171,10 @@ function createZebydracorn()
 	zebydracorn.createPiece('zebydracornBody','zebydracornNeck',95,60,63,30, 30,24,15,-5,10);
 		
 	//multi heads
-	var heads = Math.ceil(Math.random()*4);
+	var heads = Math.ceil(Math.random()*8);
 	for (var n=0;n<heads;++n)
 	{
-		limit = Math.ceil(Math.random()*10);
+		limit = Math.ceil(Math.random()*20);
 		var prevNeck = 'zebydracornNeck';
 		// multi long necks
 		for (i=0;i<limit;++i)
@@ -148,8 +198,8 @@ function createZebydracorn()
 	zebydracorn.createPiece('zebydracornBody','zebydracornTail',167,144,32,62,5,13,58,77,10);
 
 	//multi tails
-	var tails = Math.ceil(Math.random()*4);
-	var length = Math.ceil(Math.random()*5);
+	var tails = Math.ceil(Math.random()*2);
+	var length = Math.ceil(Math.random()*10);
 	for (var n=0;n<tails;++n)
 	{
 		var prevTail = 'zebydracornTail';
@@ -188,68 +238,115 @@ function animate() {
 
 
 
+///////////////////////////
+// Inheritance instantiation
+
+Function.prototype.inheritsFrom = function( parentClassOrObject ){ 
+	if ( parentClassOrObject.constructor == Function ) 
+	{ 
+		//Normal Inheritance 
+		this.prototype = new parentClassOrObject;
+		this.prototype.constructor = this;
+		this.prototype.parent = parentClassOrObject.prototype;
+	} 
+	else 
+	{ 
+		//Pure Virtual Inheritance 
+		this.prototype = parentClassOrObject;
+		this.prototype.constructor = this;
+		this.prototype.parent = parentClassOrObject;
+	} 
+	return this;
+} 
+
+
+
+
+
+
+
+
+function Zebra(id) {
+	this._id = id;
+}
+
+Zebra.inheritsFrom(Armature);
+Zebra.prototype.kickLegs = function()
+{
+	
+}
+
+
+
+
+
+
 /////////////////////////////
 //////  ARMATURE EXPERIMENTATION
 
 
 
+function Armature(id) {
 
+	this._id = id;
+	this._num;
+	this._context;
 
-$.fn.Armature = function($id) 
+	this._pieces = [];
+	this._piecesHash = [];
+
+	this._asset;
+
+	//this._xpos = 0
+	//this._ypos = 0
+	//this._index = 0
+	//this._numFrames = 5
+	//frameWidth = spriteW, frameHeight = spriteH, width = 200, height = 206;
+
+}
+
+Armature.prototype.createArmature = function(num,imageAsset) 
 {
+    
+	this._num = num;
+	this._asset = imageAsset;
+	
+}
 
 
-	//var id, animation, spriteCanvas, context, xpos = 0, ypos = 0, index = 0, numFrames = 40, frameSize = 142, width = 1024, height = 1024;
-	var _id = $id;
-	var _num;
-	var animation, context, xpos = 0, ypos = 0, index = 0, numFrames = 5, frameWidth = spriteW, frameHeight = spriteH, width = 200, height = 206;
+Armature.prototype.createPiece = function(parentID, partID, drawX, drawY, w, h, pivotX, pivotY, posX, posY, zIndex, scale, rotate)
+{
+	
+	var parentSprite = $('#'+parentID+'--'+this._num);
+	var pID = partID+'--'+this._num;
+	var cID = partID+'CanvasP'+this._num;
 
-	var _pieces = [];
+	console.log(partID+'    '+parentID+'--'+this._num+'       '+cID);
+
+	parentSprite.append('<div id="'+pID+'" style="z-index:'+zIndex+';" class="armatureSprite"><canvas id="'+cID+'" class="armatureCanvas" width="'+w+'" height ="'+h+'"></canvas></div>');
+
+	var pieceSprite = $('#'+pID);
+	var spriteCanvas = document.getElementById(cID);
+	if (scale == undefined) scale = 1;
+	if (rotate == undefined) rotate = Math.random()*40 - 20;
+	var partObj = {id:partID,	num:this._pieces.length,		sprite:pieceSprite,   	pivotX:pivotX,		pivotY:pivotY,		rot:rotate};
+	this._pieces.push(partObj);
+	this._piecesHash[partID] = partObj;
+	this._context = spriteCanvas.getContext("2d");
+	this._context.drawImage(this._asset, drawX, drawY, w, h, 0, 0, w, h);
+	TweenMax.to(pieceSprite,0,{x:posX,y:posY, scale: scale});
+}
 
 
+Armature.prototype.animatePieces = function()
+{
+	var i = 0;
+	var limit = this._pieces.length;
 
-	this.createArmature = function(num) 
+	for (i=0;i<limit;++i)
 	{
-	    
-		_num = num;
-		
+		var piece = this._pieces[i];
+		console.log(piece.num+'  '+piece.id);
+		TweenMax.to(piece.sprite,(Math.random() * 4)+2,{ease:Strong.easeInOut, delay: Math.random(), rotation:piece.rot, transformOrigin:piece.pivotX+'px '+piece.pivotY+'px', yoyo:true, repeat:-1});
 	}
-
-	this.createPiece = function(parentID, partID, drawX, drawY, w, h, pivotX, pivotY, posX, posY, zIndex, scale, rotate)
-	{
-		console.log(partID);
-		var parentSprite = $('#'+parentID+_num);
-
-		parentSprite.append('<div id="'+(partID+_num)+'" style="z-index:'+zIndex+';" class="armatureSprite"><canvas id="'+(partID+'Canvas'+_num)+'" class="armatureCanvas" width="'+w+'" height ="'+h+'"></canvas></div>');
-
-		var pieceSprite = $('#'+partID+_num);
-		var spriteCanvas = document.getElementById(partID+'Canvas'+_num);
-		if (scale == undefined) scale = 1;
-		if (rotate == undefined) rotate = Math.random()*40 - 20;
-		_pieces.push({sprite:pieceSprite,   	pivotX:pivotX,		pivotY:pivotY,		rot:rotate});
-		context = spriteCanvas.getContext("2d");
-		context.drawImage(image, drawX, drawY, w, h, 0, 0, w, h);
-		TweenMax.to(pieceSprite,0,{x:posX,y:posY, scale: scale});
-	}
-
-	this.animatePieces = function()
-	{
-		var i = 0;
-		var limit = _pieces.length;
-
-		for (i=0;i<limit;++i)
-		{
-			var piece = _pieces[i];
-			TweenMax.to(piece.sprite,(Math.random() * 4)+2,{ease:Strong.easeInOut, delay: Math.random(), rotation:piece.rot, transformOrigin:piece.pivotX+'px '+piece.pivotY+'px', yoyo:true, repeat:-1});
-		}
-	}
-
-
-	function startLoop() {
-		clearInterval(animation);
-		animation = setInterval(function(){loopTimer()},1000/12);
-	}
-
-
-    return this;
-};
+}
