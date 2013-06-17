@@ -331,47 +331,72 @@ Sumo.prototype.stomp = function()
 	var sA = Math.random() * 60 + 15;
 
 	var tl = new TimelineLite();
+	var timing = 1;
 
-	tl.to(sB.sprite,1,{ease:Strong.easeInOut, y:sB.originY-sA*.8, x:sB.originX-sA*.8, rotation:-sA+'deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'startRight'),
-	tl.to(lT.sprite,1,{ease:Strong.easeInOut, rotation:sA*.4+'deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'startRight'),
-	tl.to(lL.sprite,1,{ease:Strong.easeInOut, rotation:sA*.4+'deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'startRight'),
-	tl.to(rL.sprite,1,{ease:Strong.easeInOut, rotation:-sA*.4+'deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'startRight'),
-	tl.to(lS.sprite,1,{ease:Strong.easeInOut, rotation:sA*.75+'deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'startRight'),
-	tl.to(lA.sprite,1,{ease:Strong.easeInOut, rotation:sA*.75+'deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'startRight'),
-	tl.to(sH.sprite,1,{ease:Strong.easeInOut, rotation:sA*.75+'deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'startRight'),
+	tl.to(sB.sprite,timing,{ease:Strong.easeInOut, y:sB.originY-sA*.8, x:sB.originX-sA*.8, rotation:-sA+'deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'startRight'),
+	tl.to(lT.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.4+'deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'startRight'),
+	tl.to(lL.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.4+'deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'startRight'),
+	tl.to(rL.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.8+'deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'startRight'),
+	tl.to(lS.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.75+'deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'startRight'),
+	tl.to(lA.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.75+'deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'startRight'),
+	tl.to(sH.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.75+'deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'startRight'),
 
-	tl.to(sB.sprite,.5,{ease:Strong.easeOut, y:sB.originY, x:sB.originX, rotation:'0deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'stompRight'),
-	tl.to(lT.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'stompRight'),
-	tl.to(lL.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'stompRight'),
-	tl.to(rL.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'stompRight'),
-	tl.to(lS.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'stompRight'),
-	tl.to(lA.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'stompRight'),
-	tl.to(sH.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'stompRight'),
+	timing = .5;
+	tl.add('stompRight','+= .2');
+	tl.to(sB.sprite,timing,{ease:Strong.easeOut, y:sB.originY, x:sB.originX, rotation:'0deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'stompRight'),
+	tl.to(lT.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'stompRight'),
+	tl.to(lL.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'stompRight'),
+	tl.to(rL.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'stompRight'),
+	tl.to(lS.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'stompRight'),
+	tl.to(lA.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'stompRight'),
+	tl.to(sH.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'stompRight'),
 
-	tl.add('sumoJiggle1','stompRight -=.3');
-	tl.to(sT.sprite,.5,{ease:Elastic.easeOut, y:sT.originY + sA*.05,rotation:sA*.05+'deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle1'),
-	tl.to(sT.sprite,.5,{ease:Elastic.easeInOut, y: sT.originY, rotation:'0deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle1 -=.3'),
-	
-	tl.add('startLeft','sumoJiggle1 -=.3');
-	tl.to(sB.sprite,1,{ease:Strong.easeInOut, y: -sA*.8, x:sB.originX+sA*.8, rotation:sA+'deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'startLeft'),
-	tl.to(rT.sprite,1,{ease:Strong.easeInOut, rotation:-sA*.4+'deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'startLeft'),
-	tl.to(rL.sprite,1,{ease:Strong.easeInOut, rotation:-sA*.4+'deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'startLeft'),
-	tl.to(lL.sprite,1,{ease:Strong.easeInOut, rotation:sA*.4+'deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'startLeft'),
-	tl.to(rS.sprite,1,{ease:Strong.easeInOut, rotation:-sA*.75+'deg', transformOrigin:rS.pivotX+'px '+rS.pivotY+'px'},'startLeft'),
-	tl.to(rA.sprite,1,{ease:Strong.easeInOut, rotation:-sA*.75+'deg', transformOrigin:rA.pivotX+'px '+rA.pivotY+'px'},'startLeft'),
-	tl.to(sH.sprite,1,{ease:Strong.easeInOut, rotation:-sA*.75+'deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'startLeft'),
+	tl.add('sumoJiggle1','-=.3');
+	tl.to(sT.sprite,timing,{ease:Elastic.easeOut, y:sT.originY + sA*.05,rotation:sA*.05+'deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle1'),
+	tl.to(sT.sprite,timing,{ease:Elastic.easeInOut, y: sT.originY, rotation:'0deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle1 -=.3'),
 
-	tl.to(sB.sprite,.5,{ease:Strong.easeOut, y:sB.originY, x:sB.originX, rotation:'0deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'stompLeft'),
-	tl.to(rT.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'stompLeft');
-	tl.to(lL.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'stompLeft'),
-	tl.to(rL.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'stompLeft'),
-	tl.to(rS.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rS.pivotX+'px '+rS.pivotY+'px'},'stompLeft'),
-	tl.to(rA.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rA.pivotX+'px '+rA.pivotY+'px'},'stompLeft'),
-	tl.to(sH.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'stompLeft'),
 
-	tl.add('sumoJiggle2','stompLeft -=.3');
-	tl.to(sT.sprite,.5,{ease:Elastic.easeOut, y:sT.originY + sA*.05,rotation:-sA*.05+'deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle2'),
-	tl.to(sT.sprite,.5,{ease:Elastic.easeInOut, y: sT.originY, rotation:'0deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle2 -=.4'),
+	timing = 1;
+
+	tl.add('startLeft');
+	tl.to(sB.sprite,timing,{ease:Strong.easeInOut, y: -sA*.8, x:sB.originX+sA*.8, rotation:sA+'deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'startLeft'),
+	tl.to(rT.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.4+'deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'startLeft'),
+	tl.to(rL.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.4+'deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'startLeft'),
+	tl.to(lL.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.8+'deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'startLeft'),
+	tl.to(rS.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.75+'deg', transformOrigin:rS.pivotX+'px '+rS.pivotY+'px'},'startLeft'),
+	tl.to(rA.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.75+'deg', transformOrigin:rA.pivotX+'px '+rA.pivotY+'px'},'startLeft'),
+	tl.to(sH.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.75+'deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'startLeft'),
+
+	timing = .5;
+	tl.add('stompLeft','+= .2');
+	tl.to(sB.sprite,timing,{ease:Strong.easeOut, y:sB.originY, x:sB.originX, rotation:'0deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'stompLeft'),
+	tl.to(rT.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'stompLeft');
+	tl.to(lL.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'stompLeft'),
+	tl.to(rL.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'stompLeft'),
+	tl.to(rS.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rS.pivotX+'px '+rS.pivotY+'px'},'stompLeft'),
+	tl.to(rA.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rA.pivotX+'px '+rA.pivotY+'px'},'stompLeft'),
+	tl.to(sH.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:sH.pivotX+'px '+sH.pivotY+'px'},'stompLeft'),
+
+	tl.add('sumoJiggle2','-=.3');
+	tl.to(sT.sprite,timing,{ease:Elastic.easeOut, y:sT.originY + sA*.05,rotation:-sA*.05+'deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle2'),
+	tl.to(sT.sprite,timing,{ease:Elastic.easeInOut, y: sT.originY, rotation:'0deg', transformOrigin:sT.pivotX+'px '+sT.pivotY+'px'},'sumoJiggle2 -=.4'),
+
+	timing = 2;
+	tl.add('sumoSquat');
+	tl.to(sB.sprite,timing,{ease:Strong.easeInOut, y:sB.originY+sA*.8, transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'sumoSquat'),
+	tl.to(lT.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.8+'deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'sumoSquat'),
+	tl.to(lL.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.8+'deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'sumoSquat'),
+	tl.to(lS.sprite,timing,{ease:Strong.easeInOut, rotation:15+'deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'sumoSquat'),
+	tl.to(lA.sprite,timing,{ease:Strong.easeInOut, rotation:90+'deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'sumoSquat'),
+	tl.to(rT.sprite,timing,{ease:Strong.easeInOut, rotation:-sA*.8+'deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'sumoSquat'),
+	tl.to(rL.sprite,timing,{ease:Strong.easeInOut, rotation:sA*.8+'deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'sumoSquat'),
+	tl.to(lT.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'squatStop'),
+	tl.to(lL.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'squatStop'),
+	tl.to(lS.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'squatStop'),
+	tl.to(lA.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'squatStop'),
+	tl.to(rT.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'squatStop'),
+	tl.to(rL.sprite,timing,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'},'squatStop'),
+	tl.to(sB.sprite,timing,{ease:Strong.easeOut, y:sB.originY, transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'squatStop'),
 	//tl.to(lL.sprite,.5,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'}, '-=.5'),
 	
 	//tl.to(b.sprite,1.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stomp'),
@@ -387,6 +412,11 @@ Sumo.prototype.stomp = function()
 	//var piece = this._piecesHash['sumoRightThigh'];
 	//var rot;
 	//TweenMax.to(piece.sprite,(Math.random() * 4)+2,{ease:Strong.easeInOut, delay: Math.random(), rotation: piece.rot, transformOrigin:piece.pivotX+'px '+piece.pivotY+'px', yoyo:true, repeat:-1});
+}
+
+Sumo.prototype.squat = function(timeline)
+{
+
 }
 
 Sumo.prototype.jump = function()
