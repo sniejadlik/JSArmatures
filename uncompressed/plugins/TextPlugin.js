@@ -1,11 +1,10 @@
 /*!
- * VERSION: 0.3.0
- * DATE: 2013-02-25
- * JavaScript 
+ * VERSION: 0.4.0
+ * DATE: 2013-05-16
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
  * @license Copyright (c) 2008-2013, GreenSock. All rights reserved.
- * This work is subject to the terms in http://www.greensock.com/terms_of_use.html or for 
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
@@ -43,6 +42,10 @@
 					if (typeof(value) !== "object") {
 						value = {value:value};
 					}
+					if (value.value === undefined) {
+						this._text = this._original = [""];
+						return true;
+					}
 					this._delimiter = value.delimiter || "";
 					this._original = _getText(target).replace(/\s+/g, " ").split(this._delimiter);
 					this._text = value.value.replace(/\s+/g, " ").split(this._delimiter);
@@ -55,13 +58,13 @@
 						this._hasClass = true;
 					}
 					var i = this._original.length - this._text.length,
-						short = (i < 0) ? this._original : this._text;
-					this._fillChar = value.fillChar || (i > 0 && this._delimiter === "") ? "&nbsp;" : "";
+						shrt = (i < 0) ? this._original : this._text;
+					this._fillChar = value.fillChar || (value.padSpace ? "&nbsp;" : "");
 					if (i < 0) {
 						i = -i;
 					}
 					while (--i > -1) {
-						short.push(this._fillChar);
+						shrt.push(this._fillChar);
 					}
 					return true;
 				},
@@ -74,7 +77,7 @@
 						ratio = 0;
 					}
 					var l = this._text.length,
-						i = (ratio * l + 0.5) >> 0,
+						i = (ratio * l + 0.5) | 0,
 						applyNew, applyOld, str;
 					if (this._hasClass) {
 						applyNew = (this._newClass && i !== 0);
@@ -89,6 +92,6 @@
 			}),
 			p = TextPlugin.prototype;
 		
-		p._newClass = p._oldClass = "";
+		p._newClass = p._oldClass = p._delimiter = "";
 
 }); if (window._gsDefine) { window._gsQueue.pop()(); }

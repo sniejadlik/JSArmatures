@@ -319,25 +319,36 @@ Sumo.prototype.stomp = function()
 	var b = this._piecesHash['sumoBody'];
 	var lT = this._piecesHash['sumoLeftThigh'];
 	var lL = this._piecesHash['sumoLeftLeg'];
+	var lS = this._piecesHash['sumoLeftShoulder'];
+	var lA = this._piecesHash['sumoLeftArm'];
 	var rT = this._piecesHash['sumoRightThigh'];
 	var rL = this._piecesHash['sumoRightLeg'];
+	var rS = this._piecesHash['sumoRightShoulder'];
+	var rA = this._piecesHash['sumoRightArm'];
 
 	var tl = new TimelineLite();
 
 	tl.to(b.sprite,1,{ease:Strong.easeInOut, rotation:'-30deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'startRight'),
-	tl.to(lT.sprite,1,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'startRight'),
+	tl.to(lT.sprite,1,{ease:Strong.easeInOut, rotation:'35deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'startRight'),
+	tl.to(lS.sprite,1,{ease:Strong.easeInOut, rotation:'25deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'startRight'),
+	tl.to(lA.sprite,1,{ease:Strong.easeInOut, rotation:'-25deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'startRight'),
 
 	tl.to(b.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stompRight'),
 	tl.to(lT.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'stompRight'),
-	tl.addLabel('startLeft');
+	tl.to(lS.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lS.pivotX+'px '+lS.pivotY+'px'},'stompRight'),
+	tl.to(lA.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lA.pivotX+'px '+lA.pivotY+'px'},'stompRight'),
+	
 	tl.to(b.sprite,1,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'startLeft -=.3'),
-	tl.to(rT.sprite,1,{ease:Strong.easeInOut, rotation:'-30deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'startLeft -=.3'),
+	tl.to(rT.sprite,1,{ease:Strong.easeInOut, rotation:'-35deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'startLeft -=.3'),
+	tl.to(rS.sprite,1,{ease:Strong.easeInOut, rotation:'-25deg', transformOrigin:rS.pivotX+'px '+rS.pivotY+'px'},'startLeft -=.3'),
+	tl.to(rA.sprite,1,{ease:Strong.easeInOut, rotation:'25deg', transformOrigin:rA.pivotX+'px '+rA.pivotY+'px'},'startLeft -=.3'),
 
 	tl.to(b.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stompLeft'),
 	tl.to(rT.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'stompLeft');
+	tl.to(rS.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rS.pivotX+'px '+rS.pivotY+'px'},'stompLeft'),
+	tl.to(rA.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rA.pivotX+'px '+rA.pivotY+'px'},'stompLeft'),
 	//tl.to(lL.sprite,.5,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'}, '-=.5'),
 	
-
 	//tl.to(b.sprite,1.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stomp'),
 	//tl.to(lT.sprite,.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'}, 'stomp'),
 	//tl.to(lL.sprite,.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'stomp');
@@ -391,7 +402,7 @@ Sumo.prototype.createSumo = function(num, imageAsset)
 	this.stomp();
 
 	var sprite = $('#'+sumoID);
-	TweenMax.to(sprite,2,{css:{transform:"translateX("+((Math.random()*100)+200)*this._num+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
+	TweenMax.to(sprite,0,{css:{transform:"translateX("+((Math.random()*100)+200)*this._num+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
 	
 }
 

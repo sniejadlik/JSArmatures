@@ -1,11 +1,10 @@
 /*!
- * VERSION: beta 1.9.0
- * DATE: 2013-02-27
- * JavaScript (ActionScript 3 and 2 also available)
+ * VERSION: beta 1.9.8
+ * DATE: 2013-06-05
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
  * @license Copyright (c) 2008-2013, GreenSock. All rights reserved.
- * This work is subject to the terms in http://www.greensock.com/terms_of_use.html or for 
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
@@ -38,7 +37,7 @@
 			
 		p.constructor = TimelineMax;
 		p.kill()._gc = false;
-		TimelineMax.version = "1.9.0";
+		TimelineMax.version = "1.9.8";
 		
 		p.invalidate = function() {
 			this._yoyo = (this.vars.yoyo === true);
@@ -53,15 +52,17 @@
 		};
 		
 		p.removeCallback = function(callback, position) {
-			if (position == null) {
-				this._kill(null, callback);
-			} else {
-				var a = this.getTweensOf(callback, false),
-					i = a.length,
-					time = this._parseTimeOrLabel(position);
-				while (--i > -1) {
-					if (a[i]._startTime === time) {
-						a[i]._enabled(false, false);
+			if (callback) {
+				if (position == null) {
+					this._kill(null, callback);
+				} else {
+					var a = this.getTweensOf(callback, false),
+						i = a.length,
+						time = this._parseTimeOrLabel(position);
+					while (--i > -1) {
+						if (a[i]._startTime === time) {
+							a[i]._enabled(false, false);
+						}
 					}
 				}
 			}
@@ -90,9 +91,11 @@
 		
 		p.tweenFromTo = function(fromPosition, toPosition, vars) {
 			vars = vars || {};
-			vars.startAt = {time:this._parseTimeOrLabel(fromPosition)};
+			fromPosition = this._parseTimeOrLabel(fromPosition);
+			vars.startAt = {onComplete:this.seek, onCompleteParams:[fromPosition], onCompleteScope:this};
+			vars.immediateRender = (vars.immediateRender !== false);
 			var t = this.tweenTo(toPosition, vars);
-			return t.duration((Math.abs( t.vars.time - t.vars.startAt.time) / this._timeScale) || 0.001);
+			return t.duration((Math.abs( t.vars.time - fromPosition) / this._timeScale) || 0.001);
 		};
 		
 		p.render = function(time, suppressEvents, force) {
@@ -100,7 +103,8 @@
 				this._enabled(true, false);
 			}
 			this._active = !this._paused;
-			var totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(), 
+			var totalDur = (!this._dirty) ? this._totalDuration : this.totalDuration(),
+				dur = this._duration,
 				prevTime = this._time, 
 				prevTotalTime = this._totalTime, 
 				prevStart = this._startTime, 
@@ -108,7 +112,7 @@
 				prevRawPrevTime = this._rawPrevTime,
 				prevPaused = this._paused, 
 				prevCycle = this._cycle, 
-				tween, isComplete, next, dur, callback;
+				tween, isComplete, next, callback, internalForce, cycleDuration;
 			if (time >= totalDur) {
 				if (!this._locked) {
 					this._totalTime = totalDur;
@@ -117,56 +121,58 @@
 				if (!this._reversed) if (!this._hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
-					if (this._duration === 0) if (time === 0 || this._rawPrevTime < 0) if (this._rawPrevTime !== time) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
-						force = true;
+					if (dur === 0) if (time === 0 || this._rawPrevTime < 0) if (this._rawPrevTime !== time && this._first) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+						internalForce = true;
+						if (this._rawPrevTime > 0) {
+							callback = "onReverseComplete";
+						}
 					}
 				}
 				this._rawPrevTime = time;
 				if (this._yoyo && (this._cycle & 1) !== 0) {
-					this._time = 0;
-					time = -0.000001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+					this._time = time = 0;
 				} else {
-					this._time = this._duration;
-					time = this._duration + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+					this._time = dur;
+					time = dur + 0.000001; //to avoid occasional floating point rounding errors
 				}
 				
-			} else if (time <= 0) {
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
 				if (!this._locked) {
 					this._totalTime = this._cycle = 0;
 				}
 				this._time = 0;
-				if (prevTime !== 0 || (this._duration === 0 && this._rawPrevTime > 0 && !this._locked)) {
+				if (prevTime !== 0 || (dur === 0 && this._rawPrevTime > 0 && !this._locked)) {
 					callback = "onReverseComplete";
 					isComplete = this._reversed;
 				}
 				if (time < 0) {
 					this._active = false;
-					if (this._duration === 0) if (this._rawPrevTime >= 0) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						force = true;
+					if (dur === 0) if (this._rawPrevTime >= 0 && this._first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+						internalForce = true;
 					}
 				} else if (!this._initted) {
-					force = true;
+					internalForce = true;
 				}
 				this._rawPrevTime = time;
-				time = (this._duration === 0) ? 0 : -0.000001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = 0;  //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
 				
 			} else {
 				this._time = this._rawPrevTime = time;
 				if (!this._locked) {
 					this._totalTime = time;
 					if (this._repeat !== 0) {
-						var cycleDuration = this._duration + this._repeatDelay;
-						this._cycle = (this._totalTime / cycleDuration) >> 0; //originally _totalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but Flash reports it as 0.79999999!)
+						cycleDuration = dur + this._repeatDelay;
+						this._cycle = (this._totalTime / cycleDuration) >> 0; //originally _totalTime % cycleDuration but floating point errors caused problems, so I normalized it. (4 % 0.8 should be 0 but it gets reported as 0.79999999!)
 						if (this._cycle !== 0) if (this._cycle === this._totalTime / cycleDuration) {
 							this._cycle--; //otherwise when rendered exactly at the end time, it will act as though it is repeating (at the beginning)
 						}
 						this._time = this._totalTime - (this._cycle * cycleDuration);
 						if (this._yoyo) if ((this._cycle & 1) !== 0) {
-							this._time = this._duration - this._time;
+							this._time = dur - this._time;
 						}
-						if (this._time > this._duration) {
-							this._time = this._duration;
-							time = this._duration + 0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+						if (this._time > dur) {
+							this._time = dur;
+							time = dur + 0.000001; //to avoid occasional floating point rounding error
 						} else if (this._time < 0) {
 							this._time = time = 0;
 						} else {
@@ -192,36 +198,39 @@
 					recRawPrevTime = this._rawPrevTime,
 					recTime = this._time;
 				
-				this._totalTime = prevCycle * this._duration;
+				this._totalTime = prevCycle * dur;
 				if (this._cycle < prevCycle) {
 					backwards = !backwards;
 				} else {
-					this._totalTime += this._duration;
+					this._totalTime += dur;
 				}
 				this._time = prevTime; //temporarily revert _time so that render() renders the children in the correct order. Without this, tweens won't rewind correctly. We could arhictect things in a "cleaner" way by splitting out the rendering queue into a separate method but for performance reasons, we kept it all inside this method.
 				
-				this._rawPrevTime = (this._duration === 0) ? prevRawPrevTime - 0.00001 : prevRawPrevTime;
+				this._rawPrevTime = (dur === 0) ? prevRawPrevTime - 0.00001 : prevRawPrevTime;
 				this._cycle = prevCycle;
 				this._locked = true; //prevents changes to totalTime and skips repeat/yoyo behavior when we recursively call render()
-				prevTime = (backwards) ? 0 : this._duration;
-				this.render(prevTime, suppressEvents, (this._duration === 0));
+				prevTime = (backwards) ? 0 : dur;
+				this.render(prevTime, suppressEvents, (dur === 0));
 				if (!suppressEvents) if (!this._gc) {
 					if (this.vars.onRepeat) {
 						this.vars.onRepeat.apply(this.vars.onRepeatScope || this, this.vars.onRepeatParams || _blankArray);
 					}
 				}
 				if (wrap) {
-					prevTime = (backwards) ? this._duration + 0.000001 : -0.000001;
+					prevTime = (backwards) ? dur + 0.000001 : -0.000001;
 					this.render(prevTime, true, false);
+				}
+				this._locked = false;
+				if (this._paused && !prevPaused) { //if the render() triggered callback that paused this timeline, we should abort (very rare, but possible)
+					return;
 				}
 				this._time = recTime;
 				this._totalTime = recTotalTime;
 				this._cycle = recCycle;
 				this._rawPrevTime = recRawPrevTime;
-				this._locked = false;
 			}
 
-			if (this._time === prevTime && !force) {
+			if ((this._time === prevTime || !this._first) && !force && !internalForce) {
 				if (prevTotalTime !== this._totalTime) if (this._onUpdate) if (!suppressEvents) { //so that onUpdate fires even during the repeatDelay - as long as the totalTime changed, we should trigger onUpdate.
 					this._onUpdate.apply(this.vars.onUpdateScope || this, this.vars.onUpdateParams || _blankArray);
 				}
@@ -234,7 +243,7 @@
 				this.vars.onStart.apply(this.vars.onStartScope || this, this.vars.onStartParams || _blankArray);
 			}
 
-			if (this._time > prevTime) {
+			if (this._time >= prevTime) {
 				tween = this._first;
 				while (tween) {
 					next = tween._next; //record it here because the value could change after rendering...
@@ -278,7 +287,7 @@
 					}
 					this._active = false;
 				}
-				if (!suppressEvents) if (this.vars[callback]) {
+				if (!suppressEvents && this.vars[callback]) {
 					this.vars[callback].apply(this.vars[callback + "Scope"] || this, this.vars[callback + "Params"] || _blankArray);
 				}
 			}
@@ -449,21 +458,23 @@
 				this.smoothChildTiming = (this.vars.smoothChildTiming === true);
 				this._sortChildren = true;
 				this._onUpdate = this.vars.onUpdate;
-				var i = _paramProps.length,
+				var v = this.vars,
+					i = _paramProps.length,
 					j, a;
 				while (--i > -1) {
-					if ((a = this.vars[_paramProps[i]])) {
+					a = v[_paramProps[i]];
+					if (a) {
 						j = a.length;
 						while (--j > -1) {
 							if (a[j] === "{self}") {
-								a = this.vars[_paramProps[i]] = a.concat(); //copy the array in case the user referenced the same array in multiple timelines/tweens (each {self} should be unique)
+								a = v[_paramProps[i]] = a.concat(); //copy the array in case the user referenced the same array in multiple timelines/tweens (each {self} should be unique)
 								a[j] = this;
 							}
 						}
 					}
 				}
-				if (this.vars.tweens instanceof Array) {
-					this.add(this.vars.tweens, 0, this.vars.align, this.vars.stagger);
+				if (v.tweens instanceof Array) {
+					this.add(v.tweens, 0, v.align, v.stagger);
 				}
 			},
 			_paramProps = ["onStartParams","onUpdateParams","onCompleteParams","onReverseCompleteParams","onRepeatParams"],
@@ -475,14 +486,15 @@
 				}
 				return copy;
 			},
+			_slice = _blankArray.slice,
 			p = TimelineLite.prototype = new SimpleTimeline();
 
-		TimelineLite.version = "1.9.0";
+		TimelineLite.version = "1.9.8";
 		p.constructor = TimelineLite;
 		p.kill()._gc = false;
 
 		p.to = function(target, duration, vars, position) {
-			return this.add( new TweenLite(target, duration, vars), position);
+			return duration ? this.add( new TweenLite(target, duration, vars), position) : this.set(target, vars, position);
 		};
 
 		p.from = function(target, duration, vars, position) {
@@ -490,36 +502,30 @@
 		};
 
 		p.fromTo = function(target, duration, fromVars, toVars, position) {
-			return this.add( TweenLite.fromTo(target, duration, fromVars, toVars), position);
+			return duration ? this.add( TweenLite.fromTo(target, duration, fromVars, toVars), position) : this.set(target, toVars, position);
 		};
 
 		p.staggerTo = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
 			var tl = new TimelineLite({onComplete:onCompleteAll, onCompleteParams:onCompleteAllParams, onCompleteScope:onCompleteAllScope}),
-				i, a;
+				i;
 			if (typeof(targets) === "string") {
 				targets = TweenLite.selector(targets) || targets;
 			}
-			if (!(targets instanceof Array) && typeof(targets.each) === "function" && targets[0] && targets[0].nodeType && targets[0].style) { //senses if the targets object is a selector. If it is, we should translate it into an array.
-				a = [];
-				targets.each(function() {
-					a.push(this);
-				});
-				targets = a;
+			if (!(targets instanceof Array) && targets.length && targets[0] && targets[0].nodeType && targets[0].style) { //senses if the targets object is a selector. If it is, we should translate it into an array.
+				targets = _slice.call(targets, 0);
 			}
 			stagger = stagger || 0;
 			for (i = 0; i < targets.length; i++) {
-				if (vars.startAt != null) {
+				if (vars.startAt) {
 					vars.startAt = _copy(vars.startAt);
 				}
-				tl.add( new TweenLite(targets[i], duration, _copy(vars)), i * stagger);
+				tl.to(targets[i], duration, _copy(vars), i * stagger);
 			}
 			return this.add(tl, position);
 		};
 
 		p.staggerFrom = function(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope) {
-			if (vars.immediateRender == null) {
-				vars.immediateRender = true;
-			}
+			vars.immediateRender = (vars.immediateRender != false);
 			vars.runBackwards = true;
 			return this.staggerTo(targets, duration, vars, stagger, position, onCompleteAll, onCompleteAllParams, onCompleteAllScope);
 		};
@@ -599,7 +605,7 @@
 				} else if (typeof(value) === "function") {
 					value = TweenLite.delayedCall(0, value);
 				} else {
-					throw("Cannot add " + value + " into the TimelineLite/Max: it is neither a tween, timeline, function, nor a String.");
+					throw("Cannot add " + value + " into the timeline; it is neither a tween, timeline, function, nor a string.");
 				}
 			}
 
@@ -635,6 +641,17 @@
 				return this.removeLabel(value);
 			}
 			return this.kill(null, value);
+		};
+
+		p._remove = function(tween, skipDisable) {
+			SimpleTimeline.prototype._remove.call(this, tween, skipDisable);
+			if (!this._last) {
+				this._time = this._totalTime = 0;
+			} else if (this._time > this._last._startTime) {
+				this._time = this.duration();
+				this._totalTime = this._totalDuration;
+			}
+			return this;
 		};
 
 		p.append = function(value, offsetOrLabel) {
@@ -705,7 +722,7 @@
 		};
 
 		p.gotoAndPlay = function(position, suppressEvents) {
-			return SimpleTimeline.prototype.play.call(this, position, suppressEvents);
+			return this.play(position, suppressEvents);
 		};
 
 		p.gotoAndStop = function(position, suppressEvents) {
@@ -722,20 +739,23 @@
 				prevStart = this._startTime,
 				prevTimeScale = this._timeScale,
 				prevPaused = this._paused,
-				tween, isComplete, next, callback;
+				tween, isComplete, next, callback, internalForce;
 			if (time >= totalDur) {
 				this._totalTime = this._time = totalDur;
 				if (!this._reversed) if (!this._hasPausedChild()) {
 					isComplete = true;
 					callback = "onComplete";
-					if (this._duration === 0) if (time === 0 || this._rawPrevTime < 0) if (this._rawPrevTime !== time) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
-						force = true;
+					if (this._duration === 0) if (time === 0 || this._rawPrevTime < 0) if (this._rawPrevTime !== time && this._first) { //In order to accommodate zero-duration timelines, we must discern the momentum/direction of time in order to render values properly when the "playhead" goes past 0 in the forward direction or lands directly on it, and also when it moves past it in the backward direction (from a postitive time to a negative time).
+						internalForce = true;
+						if (this._rawPrevTime > 0) {
+							callback = "onReverseComplete";
+						}
 					}
 				}
 				this._rawPrevTime = time;
 				time = totalDur + 0.000001; //to avoid occasional floating point rounding errors - sometimes child tweens/timelines were not being fully completed (their progress might be 0.999999999999998 instead of 1 because when _time - tween._startTime is performed, floating point errors would return a value that was SLIGHTLY off)
 
-			} else if (time <= 0) {
+			} else if (time < 0.0000001) { //to work around occasional floating point math artifacts, round super small values to 0.
 				this._totalTime = this._time = 0;
 				if (prevTime !== 0 || (this._duration === 0 && this._rawPrevTime > 0)) {
 					callback = "onReverseComplete";
@@ -743,20 +763,19 @@
 				}
 				if (time < 0) {
 					this._active = false;
-					if (this._duration === 0) if (this._rawPrevTime >= 0) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
-						force = true;
+					if (this._duration === 0) if (this._rawPrevTime >= 0 && this._first) { //zero-duration timelines are tricky because we must discern the momentum/direction of time in order to determine whether the starting values should be rendered or the ending values. If the "playhead" of its timeline goes past the zero-duration tween in the forward direction or lands directly on it, the end values should be rendered, but if the timeline's "playhead" moves past it in the backward direction (from a postitive time to a negative time), the starting values must be rendered.
+						internalForce = true;
 					}
 				} else if (!this._initted) {
-					force = true;
+					internalForce = true;
 				}
 				this._rawPrevTime = time;
-				time = -0.000001; //to avoid occasional floating point rounding errors in Flash - sometimes child tweens/timelines were not being rendered at the very beginning (their progress might be 0.000000000001 instead of 0 because when Flash performed _time - tween._startTime, floating point errors would return a value that was SLIGHTLY off)
+				time = 0; //to avoid occasional floating point rounding errors (could cause problems especially with zero-duration tweens at the very beginning of the timeline)
 
 			} else {
 				this._totalTime = this._time = this._rawPrevTime = time;
 			}
-
-			if (this._time === prevTime && !force) {
+			if ((this._time === prevTime || !this._first) && !force && !internalForce) {
 				return;
 			} else if (!this._initted) {
 				this._initted = true;
@@ -765,7 +784,7 @@
 				this.vars.onStart.apply(this.vars.onStartScope || this, this.vars.onStartParams || _blankArray);
 			}
 
-			if (this._time > prevTime) {
+			if (this._time >= prevTime) {
 				tween = this._first;
 				while (tween) {
 					next = tween._next; //record it here because the value could change after rendering...
@@ -812,7 +831,7 @@
 					}
 					this._active = false;
 				}
-				if (!suppressEvents) if (this.vars[callback]) {
+				if (!suppressEvents && this.vars[callback]) {
 					this.vars[callback].apply(this.vars[callback + "Scope"] || this, this.vars[callback + "Params"] || _blankArray);
 				}
 			}
@@ -882,6 +901,7 @@
 		p.shiftChildren = function(amount, adjustLabels, ignoreBeforeTime) {
 			ignoreBeforeTime = ignoreBeforeTime || 0;
 			var tween = this._first,
+				labels = this._labels,
 				p;
 			while (tween) {
 				if (tween._startTime >= ignoreBeforeTime) {
@@ -890,9 +910,9 @@
 				tween = tween._next;
 			}
 			if (adjustLabels) {
-				for (p in this._labels) {
-					if (this._labels[p] >= ignoreBeforeTime) {
-						this._labels[p] += amount;
+				for (p in labels) {
+					if (labels[p] >= ignoreBeforeTime) {
+						labels[p] += amount;
 					}
 				}
 			}
@@ -900,10 +920,10 @@
 		};
 
 		p._kill = function(vars, target) {
-			if (vars == null) if (target == null) {
+			if (!vars && !target) {
 				return this._enabled(false, false);
 			}
-			var tweens = (target == null) ? this.getChildren(true, true, false) : this.getTweensOf(target),
+			var tweens = (!target) ? this.getChildren(true, true, false) : this.getTweensOf(target),
 				i = tweens.length,
 				changed = false;
 			while (--i > -1) {
@@ -958,7 +978,7 @@
 				}
 				return this._duration;
 			}
-			if (this.duration() !== 0) if (value !== 0) {
+			if (this.duration() !== 0 && value !== 0) {
 				this.timeScale(this._duration / value);
 			}
 			return this;

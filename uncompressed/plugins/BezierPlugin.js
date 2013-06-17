@@ -1,11 +1,10 @@
 /*!
- * VERSION: beta 1.2.0
- * DATE: 2013-02-27
- * JavaScript (also available in AS3 and AS2)
+ * VERSION: beta 1.2.4
+ * DATE: 2013-04-19
  * UPDATES AND DOCS AT: http://www.greensock.com
  *
  * @license Copyright (c) 2008-2013, GreenSock. All rights reserved.
- * This work is subject to the terms in http://www.greensock.com/terms_of_use.html or for 
+ * This work is subject to the terms at http://www.greensock.com/terms_of_use.html or for
  * Club GreenSock members, the software agreement that was issued with your membership.
  * 
  * @author: Jack Doyle, jack@greensock.com
@@ -65,9 +64,9 @@
 						r1 = _r1[i];
 						r2 = _r2[i];
 						tl = ((r2 + r1) * curviness * 0.25) / (basic ? 0.5 : _r3[i] || 0.5);
-						m1 = p2 - (p2 - p1) * (basic ? curviness * 0.5 : tl / r1);
-						m2 = p2 + (p3 - p2) * (basic ? curviness * 0.5 : tl / r2);
-						mm = p2 - (m1 + (m2 - m1) * ((r1 * 3 / (r1 + r2)) + 0.5) / 4);
+						m1 = p2 - (p2 - p1) * (basic ? curviness * 0.5 : (r1 !== 0 ? tl / r1 : 0));
+						m2 = p2 + (p3 - p2) * (basic ? curviness * 0.5 : (r2 !== 0 ? tl / r2 : 0));
+						mm = p2 - (m1 + (((m2 - m1) * ((r1 * 3 / (r1 + r2)) + 0.5) / 4) || 0));
 					} else {
 						m1 = p2 - (p2 - p1) * curviness * 0.5;
 						m2 = p2 + (p3 - p2) * curviness * 0.5;
@@ -309,6 +308,7 @@
 					propName: "bezier",
 					priority: -1,
 					API: 2,
+					global:true,
 
 					//gets called when the tween renders for the first time. This is where initial values should be recorded and any setup routines should run.
 					init: function(target, vars, tween) {
@@ -453,25 +453,30 @@
 								p = ar[i][2];
 								add = ar[i][3] || 0;
 								conv = (ar[i][4] === true) ? 1 : _RAD2DEG;
-								b = this._beziers[ar[i][0]][curIndex];
-								b2 = this._beziers[ar[i][1]][curIndex];
+								b = this._beziers[ar[i][0]];
+								b2 = this._beziers[ar[i][1]];
 
-								x1 = b.a + (b.b - b.a) * t;
-								x2 = b.b + (b.c - b.b) * t;
-								x1 += (x2 - x1) * t;
-								x2 += ((b.c + (b.d - b.c) * t) - x2) * t;
+								if (b && b2) { //in case one of the properties got overwritten.
+									b = b[curIndex];
+									b2 = b2[curIndex];
 
-								y1 = b2.a + (b2.b - b2.a) * t;
-								y2 = b2.b + (b2.c - b2.b) * t;
-								y1 += (y2 - y1) * t;
-								y2 += ((b2.c + (b2.d - b2.c) * t) - y2) * t;
+									x1 = b.a + (b.b - b.a) * t;
+									x2 = b.b + (b.c - b.b) * t;
+									x1 += (x2 - x1) * t;
+									x2 += ((b.c + (b.d - b.c) * t) - x2) * t;
 
-								val = Math.atan2(y2 - y1, x2 - x1) * conv + add;
+									y1 = b2.a + (b2.b - b2.a) * t;
+									y2 = b2.b + (b2.c - b2.b) * t;
+									y1 += (y2 - y1) * t;
+									y2 += ((b2.c + (b2.d - b2.c) * t) - y2) * t;
 
-								if (func[p]) {
-									func[p].call(target, val);
-								} else {
-									target[p] = val;
+									val = Math.atan2(y2 - y1, x2 - x1) * conv + add;
+
+									if (func[p]) {
+										target[p](val);
+									} else {
+										target[p] = val;
+									}
 								}
 							}
 						}
@@ -496,7 +501,7 @@
 				_parseToProxy = _internals._parseToProxy,
 				_setPluginRatio = _internals._setPluginRatio,
 				CSSPropTween = _internals.CSSPropTween;
-			_internals._registerComplexSpecialProp("bezier", null, function(t, e, prop, cssp, pt, plugin) {
+			_internals._registerComplexSpecialProp("bezier", {parser:function(t, e, prop, cssp, pt, plugin) {
 				if (e instanceof Array) {
 					e = {values:e};
 				}
@@ -536,7 +541,7 @@
 				}
 				plugin._onInitTween(data.proxy, v, cssp._tween);
 				return pt;
-			});
+			}});
 		};
 
 		p._roundProps = function(lookup, value) {
