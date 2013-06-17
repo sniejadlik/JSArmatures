@@ -59,17 +59,17 @@ function init()
 	var limit = 3;
 	for (i=0;i<limit;++i)
 	{
-		/*var zebydracornID = "zebydracornSprite--"+i;
-				var zebydracorn = new Zebydracorn(zebydracornID)
-				zebydracorn.createZebydracorn(i,image);
-*/
+		//var zebydracornID = "zebydracornSprite--"+i;
+		//var zebydracorn = new Zebydracorn(zebydracornID)
+		//zebydracorn.createZebydracorn(i,image);
 
 
+		var rnd = 2;//Math.floor(Math.random()*3);
 		
 		//createZebra();
 		//createZebydracorn();
 		//createStrongman();
-		switch(i)
+		switch(rnd)
 		{
 			case 0:
 				var zebraID = "zebraSprite--"+i;
@@ -85,8 +85,8 @@ function init()
 
 			case 2:
 				var sumoID = "sumoSprite--"+i;
-		var sumo = new Sumo(sumoID)
-		sumo.createSumo(i,sumoSource);
+				var sumo = new Sumo(sumoID)
+				sumo.createSumo(i,sumoSource);
 				//var strongmanID = "strongmanSprite--"+i;
 				//var strongman = new Strongman(strongmanID)
 				//strongman.createStrongman(i,image2);
@@ -313,6 +313,52 @@ function Sumo(id)
 }
 Sumo.inheritsFrom(Armature);
 
+Sumo.prototype.stomp = function()
+{
+	console.log('JUMPING');
+	var b = this._piecesHash['sumoBody'];
+	var lT = this._piecesHash['sumoLeftThigh'];
+	var lL = this._piecesHash['sumoLeftLeg'];
+	var rT = this._piecesHash['sumoRightThigh'];
+	var rL = this._piecesHash['sumoRightLeg'];
+
+	var tl = new TimelineLite();
+
+	tl.to(b.sprite,1,{ease:Strong.easeInOut, rotation:'-30deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'startRight'),
+	tl.to(lT.sprite,1,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'startRight'),
+
+	tl.to(b.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stompRight'),
+	tl.to(lT.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'},'stompRight'),
+	tl.addLabel('startLeft');
+	tl.to(b.sprite,1,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'startLeft -=.3'),
+	tl.to(rT.sprite,1,{ease:Strong.easeInOut, rotation:'-30deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'startLeft -=.3'),
+
+	tl.to(b.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stompLeft'),
+	tl.to(rT.sprite,.5,{ease:Strong.easeOut, rotation:'0deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'stompLeft');
+	//tl.to(lL.sprite,.5,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'}, '-=.5'),
+	
+
+	//tl.to(b.sprite,1.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:b.pivotX+'px '+b.pivotY+'px'},'stomp'),
+	//tl.to(lT.sprite,.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:lT.pivotX+'px '+lT.pivotY+'px'}, 'stomp'),
+	//tl.to(lL.sprite,.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:lL.pivotX+'px '+lL.pivotY+'px'},'stomp');
+
+	//tl.to(rT.sprite,1.5,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'},'stomp'),
+	//tl.to(rL.sprite,.5,{ease:Strong.easeInOut, rotation:'30deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'}, '-=.5'),
+	//tl.to(rT.sprite,.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:rT.pivotX+'px '+rT.pivotY+'px'}, '-=.5'),
+	//tl.to(rL.sprite,.5,{ease:Strong.easeInOut, rotation:'0deg', transformOrigin:rL.pivotX+'px '+rL.pivotY+'px'}, '-=.5');
+
+	tl.play();
+	//var piece = this._piecesHash['sumoRightThigh'];
+	//var rot;
+	//TweenMax.to(piece.sprite,(Math.random() * 4)+2,{ease:Strong.easeInOut, delay: Math.random(), rotation: piece.rot, transformOrigin:piece.pivotX+'px '+piece.pivotY+'px', yoyo:true, repeat:-1});
+}
+
+Sumo.prototype.jump = function()
+{
+	TweenMax.to(piece.sprite,(Math.random() * 4)+2,{ease:Strong.easeInOut, delay: Math.random(), rotation:(rot == null) ? piece.rot : rot, transformOrigin:piece.pivotX+'px '+piece.pivotY+'px', yoyo:true, repeat:-1});
+}
+
+
 Sumo.prototype.createSumo = function(num, imageAsset) 
 {
 	console.log('sumooo');
@@ -329,28 +375,26 @@ Sumo.prototype.createSumo = function(num, imageAsset)
 	this.createPiece('sumoBody','sumoTits',96, 95, 123, 42,62,14,0,40,10,1, Math.random()*10-5);
 
 	this.createPiece('sumoBody','sumoRightShoulder', 182, 41, 74, 54, 19, 22, 90, 13, 10, 1, rot);
-	this.createPiece('sumoRightShoulder','sumoRightArm', 255, 0, 62, 96, 37, 19, 30, 20, 10, 1, rot);
+	this.createPiece('sumoRightShoulder','sumoRightArm', 255, 0, 62, 96, 37, 19, 20, 15, 10, 1, rot);
 
 	this.createPiece('sumoBody','sumoLeftShoulder', 58, 41, 74, 54, 62, 22, -38, 13, 10, 1, rot);
-	this.createPiece('sumoLeftShoulder','sumoLeftArm', 0, 0, 59, 96, 24, 22, 0, 10, 10, 1, rot);
+	this.createPiece('sumoLeftShoulder','sumoLeftArm', 0, 0, 59, 96, 24, 22, -4, 14, 10, 1, rot);
 
 	
-	this.createPiece('sumoBody','sumoRightThigh', 218, 95, 99, 73, 30, 30, 70, 70, -10, 1, rot);
-	this.createPiece('sumoRightThigh','sumoRightLeg', 255, 167, 62, 122, 38, 22, 35, 25, 10, 1, Math.random()*10-5);
+	this.createPiece('sumoBody','sumoRightThigh', 218, 95, 99, 73, 30, 30, 60, 70, -10, 1, rot);
+	this.createPiece('sumoRightThigh','sumoRightLeg', 255, 167, 62, 122, 38, 22, 40, 25, 10, 1, Math.random()*10-5);
 
 	this.createPiece('sumoBody','sumoLeftThigh', 0, 95, 99, 73, 74, 29, -38, 70, -10, 1, rot);
 	this.createPiece('sumoLeftThigh','sumoLeftLeg', 0, 167, 59, 122, 27, 22, 0, 25, 10, 1, Math.random()*10-5);
 
-	
-
-
-	
-	this.animatePieces();
+	//this.animatePieces();
+	this.stomp();
 
 	var sprite = $('#'+sumoID);
 	TweenMax.to(sprite,2,{css:{transform:"translateX("+((Math.random()*100)+200)*this._num+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
 	
 }
+
 
 
 
