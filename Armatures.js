@@ -1,6 +1,6 @@
 var zebras = 0, zebydracorns = 0, strongmen = 0, spriteW=100, spriteH=100 
 
-var image, image2, sumoSource;
+var image, image2, sumoSource, bulldogSource;
 
 
 $( document ).ready(function() {
@@ -33,9 +33,9 @@ function loadSpriteSheet() {
 }
 
 function loadSecondImage() {
-	image2 = new Image();
-    image2.src = "NN_Characters.png";
-    image2.onload = onSecondLoaded;
+	bulldogSource = new Image();
+    bulldogSource.src = "bulldog.png";
+    bulldogSource.onload = onSecondLoaded;
 
 }
 
@@ -64,7 +64,7 @@ function init()
 		//zebydracorn.createZebydracorn(i,image);
 
 
-		var rnd = 2;//Math.floor(Math.random()*3);
+		var rnd = Math.floor(Math.random()*4);
 		
 		//createZebra();
 		//createZebydracorn();
@@ -87,10 +87,11 @@ function init()
 				var sumoID = "sumoSprite--"+i;
 				var sumo = new Sumo(sumoID)
 				sumo.createSumo(i,sumoSource);
-				//var strongmanID = "strongmanSprite--"+i;
-				//var strongman = new Strongman(strongmanID)
-				//strongman.createStrongman(i,image2);
 				break;
+			case 3:
+				var bulldogID = "bulldog--"+i;
+				var bulldog = new Bulldog(bulldogID);
+				bulldog.createBulldog(i,bulldogSource);
 		}
 	}
 
@@ -330,7 +331,7 @@ Sumo.prototype.stomp = function()
 
 	var sA = Math.random() * 60 + 15;
 
-	var tl = new TimelineLite();
+	var tl = new TimelineMax({repeat:-1,repeatDelay:Math.random()*5});
 	var timing = 1;
 
 	tl.to(sB.sprite,timing,{ease:Strong.easeInOut, y:sB.originY-sA*.8, x:sB.originX-sA*.8, rotation:-sA+'deg', transformOrigin:sB.pivotX+'px '+sB.pivotY+'px'},'startRight'),
@@ -467,6 +468,142 @@ Sumo.prototype.createSumo = function(num, imageAsset)
 
 
 
+
+
+function Bulldog(id)
+{
+	console.log(id);
+	this._id = id;
+}
+Bulldog.inheritsFrom(Armature);
+
+
+Bulldog.prototype.headShake = function()
+{
+	var bB = this._piecesHash['bulldogBody'];
+	var bH = this._piecesHash['bulldogHead'];
+	var rE = this._piecesHash['bulldogRightEar'];
+	var lE = this._piecesHash['bulldogLeftEar'];
+	var bS = this._piecesHash['bulldogSnout'];
+
+	var sA = Math.random() * 10 + 5;
+
+	var tl = new TimelineLite();
+	var timing = .4;
+
+	var i;
+	var limit = 6;
+	for (i=0;i<limit;++i)
+	{
+		tl.to(bH.sprite,timing,{ease:Strong.easeIn, x:bH.originX+sA*(1/limit), y:bH.originY+sA*(1/limit),rotation:sA*(i/limit)+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'}),
+		tl.to(bH.sprite,timing,{ease:Strong.easeIn, x:bH.originX-sA*(1/limit), y:bH.originY-sA*(1/limit),rotation:-sA*(i/limit)+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'});
+	}
+
+	tl.to(bH.sprite,timing,{ease:Strong.easeOut, x:bH.originX, 		y:bH.originY,rotation:'0deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'});
+}
+
+Bulldog.prototype.legScratch = function()
+{
+	var hRL = this._piecesHash['bullDogHindRightLeg'];
+	var bH = this._piecesHash['bulldogHead'];
+	var bS = this._piecesHash['bulldogSnout'];
+	var rE = this._piecesHash['bulldogRightEar'];
+	var lE = this._piecesHash['bulldogLeftEar'];
+	var tl = new TimelineMax({repeat:-1, repeatDelay: Math.random()* 10});
+
+	var sA = Math.random() * 10 + 90;
+	var timing = .4;
+
+	tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX+sA*.1, y:hRL.originY-sA*.2,rotation:-sA+'deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px'},'scratch'),
+	tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX-.2, y:bH.originY+10,rotation:-70+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'},'scratch');
+	tl.to(bS.sprite,timing,{ease:Strong.easeInOut,rotation:16+'deg', transformOrigin:bS.pivotX+'px '+bS.pivotY+'px'},'scratch');
+	var i;
+	var limit = 8;
+	timing = .1;
+	for (i=0;i<limit;++i)
+	{
+		tl.to(bH.sprite,timing,{ease:Strong.easeInOut,rotation:-70+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'}),
+		tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX+sA*.1, y:hRL.originY-sA*.2,rotation:-sA+((Math.random()*30)-15)+'deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px', override:1});
+	}
+	var timing = .4;
+	tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX, y:hRL.originY,rotation:'0deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px'},'scratchDone'),
+	tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX, y:bH.originY,rotation:'0deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'},'scratchDone');
+	tl.to(bS.sprite,timing,{ease:Strong.easeInOut,rotation:'0deg', transformOrigin:bS.pivotX+'px '+bS.pivotY+'px'},'scratchDone');
+
+}
+
+Bulldog.prototype.headTilt = function()
+{
+
+	var bB = this._piecesHash['bulldogBody'];
+	var bH = this._piecesHash['bulldogHead'];
+	var rE = this._piecesHash['bulldogRightEar'];
+	var lE = this._piecesHash['bulldogLeftEar'];
+	var bS = this._piecesHash['bulldogSnout'];
+
+	var sA = Math.random() * 5;
+
+	var tl = new TimelineMax({repeat:-1, yoyo:true});
+	var timing = .4;
+
+	var i;
+	var limit = 6;
+	for (i=0;i<limit;++i)
+	{
+		tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX+sA*(1/limit), y:bH.originY+sA*(1/limit),rotation:sA*(i/limit)+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'}),
+		tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX-sA*(1/limit), y:bH.originY-sA*(1/limit),rotation:-sA*(i/limit)+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'});
+	}
+
+	tl.to(bH.sprite,timing,{ease:Strong.easeOut, x:bH.originX, 		y:bH.originY,rotation:'0deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'});
+}
+
+Bulldog.prototype.pant = function()
+{
+	var bM = this._piecesHash['bulldogMouth'];
+	var bC = this._piecesHash['bulldogChest'];
+	TweenMax.to(bM.sprite,.4,{ease:Strong.easeIn, y:bM.originY-5, rotation:0+'deg', transformOrigin:bM.pivotX+'px '+bM.pivotY+'px', yoyo:true, repeat:-1});
+	TweenMax.to(bC.sprite,.6,{ease:Strong.easeInOut, y:bC.originY-3, x:bC.originX+1,rotation:0+'deg', transformOrigin:bC.pivotX+'px '+bC.pivotY+'px', yoyo:true, repeat:-1});
+
+}
+
+Bulldog.prototype.tailWag = function()
+{
+	var bT = this._piecesHash['bullDogTail'];
+
+	TweenMax.to(bT.sprite,.2,{ease:Strong.easeInOut, rotation:15+'deg', transformOrigin:bT.pivotX+'px '+bT.pivotY+'px', yoyo:true, repeat:-1});
+}
+
+
+Bulldog.prototype.createBulldog = function(num, imageAsset) 
+{
+	var bulldogID = "bulldogSprite--"+num;
+	$(".strongman").append('<div id="'+bulldogID+'" class="armatureSprite Sprite" ></div>');
+
+	this.createArmature(num, imageAsset);
+
+	this.createPiece('bulldogSprite','bulldogBody',85, 0, 130, 120,73,59,0,0,1000,1, Math.random()*10-5);
+	this.createPiece('bulldogBody','bulldogChest',215,0, 97,96,58,52,33,20,10,1);
+	this.createPiece('bulldogBody', 'bullDogForeRightLeg',207,95,49,104,30,34,55,32,10,1);
+	this.createPiece('bulldogBody', 'bullDogForeLeftLeg',175,119,32,79,18,20,90,45,-10,1);
+	this.createPiece('bulldogBody', 'bullDogHindRightLeg',55,132,57,67,27,29,-3,70,10,1);
+	this.createPiece('bulldogBody', 'bullDogHindLeftLeg',111,132,59,67,29,29,20,60,-10,1);
+	this.createPiece('bulldogBody','bulldogHead',0, 30, 82, 82,42,46,65,-35,10,1, Math.random()*10-5);
+	this.createPiece('bulldogHead','bulldogRightEar',0,0,28,31,21,16,-2,10,10,1);
+	this.createPiece('bulldogHead','bulldogLeftEar',55,0,27,31,11,18,50,0,10,1);
+	this.createPiece('bulldogHead','bulldogSnout',0,110,56,51,28,11,20,18,10,1);
+	this.createPiece('bulldogSnout','bulldogMouth',0,161,56,38,30,13,0,20,-10,1);
+	
+	this.createPiece('bulldogBody', 'bullDogTail',27,0,30,30,20,18,-12,55,-10,1);
+
+	this.pant();
+	this.tailWag();
+	//this.headTilt();
+	this.legScratch();
+
+	var sprite = $('#'+bulldogID);
+	TweenMax.to(sprite,0,{css:{transform:"translateX("+((Math.random()*100)+100)*this._num+"px) translateY("+Math.random()*20+"px) "}});//       scale("+scale+","+scale+") "}});  //top:Math.random() * 300, left:Math.random() * 700, rotation:Math.random()*360});
+	
+}
 
 
 /////////////////////////////
