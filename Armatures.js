@@ -504,7 +504,10 @@ Bulldog.prototype.headShake = function()
 
 Bulldog.prototype.legScratch = function()
 {
+	var bB = this._piecesHash['bulldogBody'];
 	var hRL = this._piecesHash['bullDogHindRightLeg'];
+	var fRL = this._piecesHash['bullDogForeRightLeg'];
+	var fLL = this._piecesHash['bullDogForeLeftLeg'];
 	var bH = this._piecesHash['bulldogHead'];
 	var bS = this._piecesHash['bulldogSnout'];
 	var rE = this._piecesHash['bulldogRightEar'];
@@ -514,8 +517,12 @@ Bulldog.prototype.legScratch = function()
 	var sA = Math.random() * 10 + 90;
 	var timing = .4;
 
+	tl.to(bB.sprite,timing,{ease:Strong.easeInOut,rotation:sA*.2+'deg', transformOrigin:bB.pivotX+'px '+bB.pivotY+'px'},'scratch');
+	tl.to(fRL.sprite,timing,{ease:Strong.easeInOut,rotation:-sA*.2+'deg', transformOrigin:fRL.pivotX+'px '+fRL.pivotY+'px'},'scratch');
+	tl.to(fLL.sprite,timing,{ease:Strong.easeInOut,rotation:-sA*.2+'deg', transformOrigin:fLL.pivotX+'px '+fLL.pivotY+'px'},'scratch');
 	tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX+sA*.1, y:hRL.originY-sA*.2,rotation:-sA+'deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px'},'scratch'),
-	tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX-.2, y:bH.originY+10,rotation:-70+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'},'scratch');
+	tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX-.2, y:bH.originY+15,rotation:-70+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'},'scratch');
+	tl.to(rE.sprite,timing,{ease:Strong.easeInOut,rotation:40+'deg', transformOrigin:rE.pivotX+'px '+rE.pivotY+'px'},'scratch');
 	tl.to(bS.sprite,timing,{ease:Strong.easeInOut,rotation:16+'deg', transformOrigin:bS.pivotX+'px '+bS.pivotY+'px'},'scratch');
 	var i;
 	var limit = 8;
@@ -523,11 +530,15 @@ Bulldog.prototype.legScratch = function()
 	for (i=0;i<limit;++i)
 	{
 		tl.to(bH.sprite,timing,{ease:Strong.easeInOut,rotation:-70+'deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'}),
-		tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX+sA*.1, y:hRL.originY-sA*.2,rotation:-sA+((Math.random()*30)-15)+'deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px', override:1});
+		tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX+sA*.1, y:hRL.originY-sA*.2,rotation:-sA+(Math.random()*30-15)+'deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px'});
 	}
 	var timing = .4;
+	tl.to(bB.sprite,timing,{ease:Strong.easeInOut,rotation:'0deg', transformOrigin:bB.pivotX+'px '+bB.pivotY+'px'},'scratchDone');
+	tl.to(fRL.sprite,timing,{ease:Strong.easeInOut,rotation:'0deg', transformOrigin:fRL.pivotX+'px '+fRL.pivotY+'px'},'scratchDone');
+	tl.to(fLL.sprite,timing,{ease:Strong.easeInOut,rotation:'0deg', transformOrigin:fLL.pivotX+'px '+fLL.pivotY+'px'},'scratchDone');
 	tl.to(hRL.sprite,timing,{ease:Strong.easeInOut, x:hRL.originX, y:hRL.originY,rotation:'0deg', transformOrigin:hRL.pivotX+'px '+hRL.pivotY+'px'},'scratchDone'),
 	tl.to(bH.sprite,timing,{ease:Strong.easeInOut, x:bH.originX, y:bH.originY,rotation:'0deg', transformOrigin:bH.pivotX+'px '+bH.pivotY+'px'},'scratchDone');
+	tl.to(rE.sprite,timing,{ease:Strong.easeInOut,rotation:'0deg', transformOrigin:rE.pivotX+'px '+rE.pivotY+'px'},'scratchDone');
 	tl.to(bS.sprite,timing,{ease:Strong.easeInOut,rotation:'0deg', transformOrigin:bS.pivotX+'px '+bS.pivotY+'px'},'scratchDone');
 
 }
